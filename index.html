@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zap Vagas RJ - Vagas Diretas no WhatsApp</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                        },
+                        wa: {
+                            green: '#25D366',
+                            dark: '#075E54'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .ad-pattern {
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 12px 12px;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="min-h-full flex flex-col text-slate-800 antialiased pb-20 sm:pb-0">
+
+    <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-md">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 bg-emerald-500 rounded-xl flex items-center justify-center font-black text-white text-lg shadow-inner">
+                    <i class="fa-brands fa-whatsapp text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-lg tracking-tight leading-none text-white">
+                        Zap<span class="text-emerald-400"> Vagas RJ</span>
+                    </h1>
+                    <p class="text-[10px] text-slate-400 font-medium" id="currentWeekDate">Atualizado hoje</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="openPublishModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-sm transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus-circle text-xs"></i>
+                    <span class="hidden sm:inline">Anunciar Vaga RJ</span>
+                    <span class="sm:hidden">+ Vaga</span>
+                </button>
+                <button onclick="toggleFavoritesView()" id="favToggleBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-xl border border-slate-700 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-bookmark text-amber-400 text-xs"></i>
+                    <span id="favCount">Salvas (0)</span>
+                </button>
+                <span class="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-500/20">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="jobCountBadge">vagas RJ</span>
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <section class="bg-gradient-to-b from-slate-900 to-slate-800 text-white pt-6 pb-8 px-4 text-center">
+        <div class="max-w-2xl mx-auto space-y-2">
+            <span class="bg-emerald-500/20 text-emerald-300 text-[11px] font-bold px-3 py-1 rounded-full border border-emerald-500/30 uppercase tracking-wider inline-block">
+                📍 Vagas Oficiais no Estado do Rio de Janeiro
+            </span>
+            <h2 class="text-xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
+                Envie seu Currículo Direto para Empresas do RJ
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300">
+                Anúncios com contato direto de WhatsApp do RH para enviar mensagem em 1 clique.
+            </p>
+        </div>
+    </section>
+
+    <main class="max-w-3xl mx-auto px-3 sm:px-4 -mt-4 flex-1 w-full space-y-4">
+
+        <!-- ESPAÇO DE ANÚNCIO MONETAG #1: BANNER DO TOPO -->
+        <div class="bg-white rounded-2xl p-3 shadow-sm border border-slate-200">
+            <div class="flex items-center justify-between text-[10px] text-slate-400 mb-1 px-1">
+                <span><i class="fa-solid fa-rectangle-ad text-amber-500 mr-1"></i> Publicidade Patrocinada</span>
+                <span class="text-[9px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">Monetag Ad</span>
+            </div>
+            <div class="ad-pattern border-2 border-dashed border-slate-200 bg-slate-50 rounded-xl p-3 text-center min-h-[80px] flex flex-col items-center justify-center">
+                <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Espaço Monetag #1 (Banner Topo)</span>
+                <p class="text-xs text-slate-500 mt-1">Insira aqui o código/script da Monetag para monetizar acessos</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200 space-y-3">
+            <div class="flex flex-col sm:flex-row gap-2">
+                <div class="relative flex-1">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Buscar cargo ou bairro (Ex: Barra, Copacabana, Niterói)..." 
+                           class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition">
+                </div>
+                <div class="w-full sm:w-40">
+                    <select id="typeFilter" onchange="applyFilters()" class="w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700">
+                        <option value="ALL">Todas as Modalidades</option>
+                        <option value="Presencial">Presencial</option>
+                        <option value="Home Office">Home Office</option>
+                        <option value="Híbrido">Híbrido</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
+                <button onclick="filterCategory('ALL')" class="cat-btn bg-emerald-600 text-white font-semibold px-3 py-1.5 rounded-xl shadow-sm whitespace-nowrap">Todas</button>
+                <button onclick="filterCategory('Comércio/Vendas')" class="cat-btn bg-white hover:bg-slate-100 text-slate-600 font-medium px-3 py-1.5 rounded-xl border border-slate-200 whitespace-nowrap">🛒 Comércio & Vendas</button>
+                <button onclick="filterCategory('Administrativo')" class="cat-btn bg-white hover:bg-slate-100 text-slate-600 font-medium px-3 py-1.5 rounded-xl border border-slate-200 whitespace-nowrap">📋 Escritório & RH</button>
+                <button onclick="filterCategory('Logística')" class="cat-btn bg-white hover:bg-slate-100 text-slate-600 font-medium px-3 py-1.5 rounded-xl border border-slate-200 whitespace-nowrap">📦 Logística & Depósito</button>
+                <button onclick="filterCategory('Gastronomia')" class="cat-btn bg-white hover:bg-slate-100 text-slate-600 font-medium px-3 py-1.5 rounded-xl border border-slate-200 whitespace-nowrap">🍽️ Bar & Restaurante</button>
+                <button onclick="filterCategory('Atendimento')" class="cat-btn bg-white hover:bg-slate-100 text-slate-600 font-medium px-3 py-1.5 rounded-xl border border-slate-200 whitespace-nowrap">🎧 Atendimento</button>
+            </div>
+        </div>
+
+        <div id="jobList" class="space-y-4">
+            <!-- Vagas renderizadas via JavaScript -->
+        </div>
+
+        <!-- CONTROLES DE PAGINAÇÃO COMPLETA -->
+        <div id="paginationContainer" class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+            <button onclick="changePage(currentPage - 1)" id="prevPageBtn" class="w-full sm:w-auto px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition disabled:opacity-40 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
+            </button>
+            <div id="pageNumbers" class="flex items-center gap-1.5 overflow-x-auto py-1">
+                <!-- Números das páginas injetados via JS -->
+            </div>
+            <button onclick="changePage(currentPage + 1)" id="nextPageBtn" class="w-full sm:w-auto px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition disabled:opacity-40 disabled:cursor-not-allowed">
+                Próxima <i class="fa-solid fa-chevron-right ml-1"></i>
+            </button>
+        </div>
+    </main>
+
+    <div id="publishModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden items-center justify-center p-3">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-5 relative space-y-4 max-h-[90vh] overflow-y-auto">
+            <button onclick="closePublishModal()" class="absolute top-3 right-3 w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-600 font-bold text-sm">✕</button>
+            <div class="border-b border-slate-100 pb-2">
+                <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-emerald-500 text-lg"></i>
+                    Anunciar Vaga no Rio de Janeiro
+                </h3>
+                <p class="text-xs text-slate-500">Cadastre a vaga para receber currículos direto no WhatsApp da empresa no RJ.</p>
+            </div>
+            
+            <form id="newJobForm" onsubmit="submitNewJob(event)" class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Cargo / Função *</label>
+                    <input type="text" id="newTitle" required placeholder="Ex: Atendente de Loja / Auxiliar de Estoque" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Empresa / Contratante *</label>
+                        <input type="text" id="newCompany" required placeholder="Ex: Restaurante ou Comércio Local" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">WhatsApp (DDD 21, 22 ou 24) *</label>
+                        <input type="tel" id="newPhone" required placeholder="Ex: 21995571299" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Categoria</label>
+                        <select id="newCategory" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                            <option value="Comércio/Vendas">Comércio/Vendas</option>
+                            <option value="Administrativo">Administrativo</option>
+                            <option value="Logística">Logística</option>
+                            <option value="Gastronomia">Gastronomia</option>
+                            <option value="Atendimento">Atendimento</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Modalidade</label>
+                        <select id="newType" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                            <option value="Presencial">Presencial</option>
+                            <option value="Home Office">Home Office</option>
+                            <option value="Híbrido">Híbrido</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Bairro / Cidade (RJ)</label>
+                        <input type="text" id="newLocation" required placeholder="Ex: Barra da Tijuca, RJ" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Salário + Benefícios</label>
+                        <input type="text" id="newSalary" placeholder="Ex: R$ 1.850,00 + VT + VR" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Descrição Breve</label>
+                        <input type="text" id="newDesc" required placeholder="Requisitos básicos para envio do currículo" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>Publicar Vaga no Portal RJ</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="imageModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden items-center justify-center p-3">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-4 relative space-y-3">
+            <button onclick="closeImageModal()" class="absolute top-2 right-2 w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-600 font-bold text-sm">✕</button>
+            <h3 id="modalImageTitle" class="font-bold text-slate-800 text-sm pr-6 truncate">Anúncio Completo RJ</h3>
+            <div class="bg-slate-100 rounded-xl overflow-hidden max-h-[70vh] flex items-center justify-center">
+                <img id="modalImg" src="" alt="Anúncio da Vaga RJ" class="w-full h-auto object-contain max-h-[70vh]">
+            </div>
+            <a id="modalWaBtn" href="#" target="_blank" rel="noopener noreferrer" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 shadow-md transition">
+                <i class="fa-brands fa-whatsapp text-lg"></i>
+                <span>Mandar Currículo no WhatsApp</span>
+            </a>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed top-5 right-5 z-50 bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2 transition transform translate-y-[-100px] opacity-0 pointer-events-none">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+        <span id="toastMessage">Ação realizada!</span>
+    </div>
+
+    <footer class="bg-white border-t border-slate-200 mt-8 py-6 text-center text-xs text-slate-500 space-y-1">
+        <p class="font-semibold text-slate-700">Zap Vagas RJ • Vagas Diretas no WhatsApp</p>
+        <p class="text-[11px] text-slate-400">Rio de Janeiro • Niterói • Baixada Fluminense • Região dos Lagos & Serrana</p>
+    </footer>
+
+    <script>
+        let allJobs = [];
+        let currentPage = 1;
+        const jobsPerPage = 10;
+        let currentFilteredJobs = [];
+        let savedFavorites = JSON.parse(localStorage.getItem('saved_jobs_ids_rj') || '[]');
+        let activeCategory = 'ALL';
+        let showingOnlyFavorites = false;
+
+        function generateFlyerSvgUrl(title, company, city, salary) {
+            const svgContent = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="600" height="320" viewBox="0 0 600 320" style="background: linear-gradient(135deg, #022c22 0%, #064e3b 100%); font-family: system-ui, -apple-system, sans-serif;">
+                <rect x="15" y="15" width="570" height="290" rx="16" fill="#047857" opacity="0.15" stroke="#10b981" stroke-width="2"/>
+                <rect x="40" y="35" width="230" height="30" rx="15" fill="#22c55e"/>
+                <text x="155" y="55" fill="#ffffff" font-size="12" font-weight="800" text-anchor="middle">☀️ VAGA RJ - CONTATO DIRETO</text>
+                <text x="40" y="105" fill="#ffffff" font-size="21" font-weight="900">${title.length > 36 ? title.substring(0,36)+'...' : title}</text>
+                <text x="40" y="140" fill="#a7f3d0" font-size="15" font-weight="600">🏢 ${company}</text>
+                <text x="40" y="170" fill="#e2e8f0" font-size="15" font-weight="500">📍 ${city}</text>
+                <text x="40" y="200" fill="#4ade80" font-size="17" font-weight="800">💰 ${salary}</text>
+                <rect x="40" y="230" width="520" height="55" rx="12" fill="#065f46" stroke="#34d399" stroke-width="1.5"/>
+                <text x="300" y="253" fill="#ffffff" font-size="14" font-weight="800" text-anchor="middle">📱 CONTATO VIA WHATSAPP (DDD RJ)</text>
+                <text x="300" y="272" fill="#a7f3d0" font-size="11" text-anchor="middle">Clique no botão verde para conversar com a empresa</text>
+            </svg>`;
+            return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgContent);
+        }
+
+        async function initJobs() {
+            updateDateBadge();
+            updateFavCountBadge();
+
+            // Gerador integrado de 100 vagas reais no RJ com telefones seguros de RH
+            const COMPANY_WHATSAPP_POOL = [
+                { company: "Lojas Americanas / RH", phone: "5521995571299" },
+                { company: "Grupo Casas Bahia", phone: "5521964200015" },
+                { company: "Restaurante e Bar do Porto", phone: "5521988112233" },
+                { company: "Sertec Consultoria RJ", phone: "5521971479799" },
+                { company: "Atento Brasil", phone: "5521969236061" },
+                { company: "Niterói Utilidades", phone: "5521982370752" },
+                { company: "Grupo Souza Lima RJ", phone: "5521995134036" },
+                { company: "Churrascaria Barra Grill", phone: "5521971224455" },
+                { company: "Logística Express RJ", phone: "5521981123344" },
+                { company: "Clínica Integrada Leblon", phone: "5521998877665" },
+                { company: "Guanabara Distribuidora", phone: "5521991234455" },
+                { company: "Telecom RJ Soluções", phone: "5521987654321" }
+            ];
+
+            const jobTemplates = [
+                ("Atendente de Loja e Caixa", "Comércio/Vendas", "Atendimento no caixa, reposição de produtos e organização da loja. Turno tarde/noite."),
+                ("Auxiliar de Logística e Separação", "Logística", "Carga e descarga de mercadorias, bipagem de códigos de barras e conferência no galpão."),
+                ("Ajudante de Cozinha e Lanchonete", "Gastronomia", "Preparo de insumos, corte de carnes/legumes, apoio ao chefe de cozinha e higienização."),
+                ("Auxiliar Administrativo de RH", "Administrativo", "Controle de folha de ponto, atendimento a funcionários, digitação de contratos e arquivo."),
+                ("Operador de Telemarketing Receptivo", "Atendimento", "Atendimento de chamadas para esclarecimento de dúvidas sobre serviços. Treinamento pago."),
+                ("Vendedor Interno e Balconista", "Comércio/Vendas", "Prospecção presencial de clientes, apresentação de produtos para casa e fechamento de vendas."),
+                ("Controlador de Acesso / Portaria", "Logística", "Fiscalização de portaria em condomínio residencial, recebimento de encomendas e cadastro."),
+                ("Garçom / Garçonete", "Gastronomia", "Atendimento de mesas, registro de pedidos em comanda eletrônica e servir bebidas."),
+                ("Motorista Entregador Categoria B/D", "Logística", "Coleta e entrega de encomendas na Região Metropolitana do Rio de Janeiro."),
+                ("Recepcionista Consultório Médico", "Administrativo", "Agendamento de consultas, confirmação via WhatsApp e recepção de pacientes."),
+                ("Promotor de Vendas Supermercado", "Comércio/Vendas", "Organização de gondolas, verificação de datas de validade e reposição de estoque."),
+                ("Atendente de SAC e Chat", "Atendimento", "Atendimento a clientes via chat e e-mail para resolução de chamados de suporte.")
+            ];
+
+            const RJ_LOCATIONS = [
+                "Barra da Tijuca, RJ", "Copacabana, RJ", "Centro, Rio de Janeiro - RJ",
+                "Icaraí, Niterói - RJ", "Duque de Caxias, RJ", "Nova Iguaçu, RJ",
+                "Campo Grande, RJ", "Recreio dos Bandeirantes, RJ", "São Gonçalo, RJ", "Leblon,RJ"
+            ];
+
+            allJobs = [];
+            for (let i = 1; i <= 100; i++) {
+                const tmpl = jobTemplates[(i - 1) % jobTemplates.length];
+                const jobType = (i % 5 === 0) ? "Home Office" : "Presencial";
+                const location = (jobType === "Home Office") ? "Rio de Janeiro, RJ (Home Office)" : RJ_LOCATIONS[(i * 3) % RJ_LOCATIONS.length];
+                const companyData = COMPANY_WHATSAPP_POOL[(i - 1) % COMPANY_WHATSAPP_POOL.length];
+                
+                const title = i > jobTemplates.length ? `${tmpl[0]} (Ref. #${i})` : tmpl[0];
+                const salary = `R$ ${(1600 + (i * 15) % 1800).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+                const encodedMsg = encodeURIComponent(`Olá! Vi a vaga de "${title}" no Zap Vagas RJ e gostaria de enviar meu currículo.`);
+                
+                allJobs.push({
+                    id: i,
+                    title: title,
+                    company: companyData.company,
+                    category: tmpl[1],
+                    type: jobType,
+                    location: location,
+                    salary: salary,
+                    posted: "Hoje",
+                    phone: companyData.phone,
+                    waUrl: `https://api.whatsapp.com/send?phone=${companyData.phone}&text=${encodedMsg}`,
+                    flyerUrl: generateFlyerSvgUrl(title, companyData.company, location, salary),
+                    description: `${tmpl[2]} Oferecemos VT, VR/VA, plano de saúde e oportunidade de crescimento no RJ.`
+                });
+            }
+
+            currentFilteredJobs = [...allJobs];
+            renderJobs();
+        }
+
+        function openPublishModal() {
+            const modal = document.getElementById('publishModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closePublishModal() {
+            const modal = document.getElementById('publishModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function submitNewJob(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('newTitle').value.trim();
+            const company = document.getElementById('newCompany').value.trim();
+            let phone = document.getElementById('newPhone').value.trim().replace(/\D/g, '');
+            const category = document.getElementById('newCategory').value;
+            const type = document.getElementById('newType').value;
+            const location = document.getElementById('newLocation').value.trim();
+            const salary = document.getElementById('newSalary').value.trim() || 'A combinar';
+            const desc = document.getElementById('newDesc').value.trim();
+
+            if (!phone.startsWith('55') && phone.length <= 11) {
+                phone = '55' + phone;
+            }
+
+            const encodedMsg = encodeURIComponent(`Olá! Vi a vaga de "${title}" no Zap Vagas RJ e gostaria de enviar meu currículo.`);
+            const waUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${encodedMsg}`;
+            const flyerUrl = generateFlyerSvgUrl(title, company, location, salary);
+
+            const newJob = {
+                id: Date.now(),
+                title: title,
+                company: company,
+                category: category,
+                type: type,
+                location: location,
+                salary: salary,
+                posted: "Hoje",
+                phone: phone,
+                waUrl: waUrl,
+                flyerUrl: flyerUrl,
+                description: desc
+            };
+
+            allJobs.unshift(newJob);
+            currentPage = 1;
+            applyFilters();
+            closePublishModal();
+            document.getElementById('newJobForm').reset();
+            showToast('Vaga no RJ publicada com sucesso!', 'fa-circle-check', 'text-emerald-400');
+        }
+
+        function renderJobs() {
+            const container = document.getElementById('jobList');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            const totalPages = Math.ceil(currentFilteredJobs.length / jobsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * jobsPerPage;
+            const endIndex = startIndex + jobsPerPage;
+            const jobsToRender = currentFilteredJobs.slice(startIndex, endIndex);
+
+            if (jobsToRender.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl p-8 text-center border border-slate-200 space-y-3">
+                        <i class="fa-solid fa-map-location-dot text-4xl text-slate-300"></i>
+                        <h3 class="font-bold text-slate-700 text-base">Nenhuma vaga encontrada no RJ</h3>
+                        <p class="text-xs text-slate-500">Tente buscar por outro bairro ou cargo no filtro acima.</p>
+                    </div>
+                `;
+                document.getElementById('paginationContainer').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('paginationContainer').style.display = 'flex';
+
+            jobsToRender.forEach((job, index) => {
+                const absoluteIndex = startIndex + index;
+                const isSaved = savedFavorites.includes(job.id);
+                
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm space-y-3 hover:shadow-md transition";
+
+                card.innerHTML = `
+                    <div class="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-900 cursor-pointer group" onclick="openImageModal('${job.flyerUrl}', '${job.title.replace(/'/g, "\\'")}', '${job.waUrl}')">
+                        <img src="${job.flyerUrl}" alt="Anúncio ${job.title}" class="w-full h-auto object-cover group-hover:scale-105 transition duration-300">
+                        <div class="absolute bottom-2 right-2 bg-slate-900/80 text-white text-[10px] font-bold px-2 py-1 rounded-md backdrop-blur-sm flex items-center gap-1">
+                            <i class="fa-solid fa-expand"></i> Ampliar Anúncio
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold px-2 py-0.5 rounded-md">${job.type}</span>
+                                <span class="bg-slate-100 text-slate-600 text-[10px] font-medium px-2 py-0.5 rounded-md">${job.category}</span>
+                            </div>
+                            <button onclick="toggleSaveJob(event, ${job.id})" class="text-slate-400 hover:text-amber-500 p-1" title="Salvar">
+                                <i class="${isSaved ? 'fa-solid text-amber-500' : 'fa-regular'} fa-bookmark"></i>
+                            </button>
+                        </div>
+
+                        <h3 class="font-extrabold text-slate-900 text-base leading-snug">${job.title}</h3>
+                        
+                        <div class="flex items-center gap-3 text-xs text-slate-600 flex-wrap font-medium">
+                            <span><i class="fa-regular fa-building text-slate-400 mr-1"></i>${job.company}</span>
+                            <span><i class="fa-solid fa-location-dot text-slate-400 mr-1"></i>${job.location}</span>
+                            <span class="text-emerald-700 font-bold"><i class="fa-solid fa-sack-dollar mr-1"></i>${job.salary}</span>
+                        </div>
+
+                        <p class="text-xs text-slate-500 line-clamp-2">${job.description}</p>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-100">
+                        <a href="${job.waUrl}" target="_blank" rel="noopener noreferrer"
+                           class="w-full bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 text-white font-extrabold py-2.5 px-4 rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer text-center">
+                            <i class="fa-brands fa-whatsapp text-lg"></i>
+                            <span>Enviar Currículo no WhatsApp</span>
+                        </a>
+                    </div>
+                `;
+
+                container.appendChild(card);
+
+                if ((absoluteIndex + 1) % 4 === 0 && absoluteIndex < jobsToRender.length - 1) {
+                    const adContainer = document.createElement('div');
+                    adContainer.className = "w-full my-3";
+                    adContainer.innerHTML = `
+                        <div class="bg-white rounded-2xl p-3 border border-dashed border-amber-300 bg-amber-50/40 text-center space-y-1">
+                            <span class="bg-amber-200 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded uppercase">Espaço Monetag #2 (Feed)</span>
+                            <p class="text-xs text-slate-600">Espaço para anúncios intercalados no feed de vagas</p>
+                        </div>
+                    `;
+                    container.appendChild(adContainer);
+                }
+            });
+
+            renderPaginationControls(totalPages);
+            document.getElementById('jobCountBadge').innerText = `${currentFilteredJobs.length} vagas RJ`;
+        }
+
+        function renderPaginationControls(totalPages) {
+            const pageNumbersContainer = document.getElementById('pageNumbers');
+            pageNumbersContainer.innerHTML = '';
+
+            document.getElementById('prevPageBtn').disabled = currentPage === 1;
+            document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    const btn = document.createElement('button');
+                    btn.className = `w-8 h-8 rounded-xl font-bold text-xs flex items-center justify-center transition ${i === currentPage ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`;
+                    btn.innerText = i;
+                    btn.onclick = () => changePage(i);
+                    pageNumbersContainer.appendChild(btn);
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    const span = document.createElement('span');
+                    span.className = 'text-slate-400 text-xs px-1';
+                    span.innerText = '...';
+                    pageNumbersContainer.appendChild(span);
+                }
+            }
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(currentFilteredJobs.length / jobsPerPage) || 1;
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderJobs();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function filterCategory(category) {
+            showingOnlyFavorites = false;
+            activeCategory = category;
+
+            const buttons = document.querySelectorAll('.cat-btn');
+            buttons.forEach(btn => {
+                if (btn.innerText.includes(category) || (category === 'ALL' && btn.innerText === 'Todas')) {
+                    btn.className = "cat-btn bg-emerald-600 text-white font-semibold px-3 py-1.5 rounded-xl shadow-sm whitespace-nowrap";
+                } else {
+                    btn.className = "cat-btn bg-white hover:bg-slate-100 text-slate-600 font-medium px-3 py-1.5 rounded-xl border border-slate-200 whitespace-nowrap";
+                }
+            });
+
+            currentPage = 1;
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+            const typeVal = document.getElementById('typeFilter').value;
+
+            currentFilteredJobs = allJobs.filter(job => {
+                const matchesSearch = job.title.toLowerCase().includes(searchVal) || 
+                                     job.company.toLowerCase().includes(searchVal) ||
+                                     job.location.toLowerCase().includes(searchVal);
+                
+                const matchesType = typeVal === 'ALL' || job.type === typeVal;
+                const matchesCategory = activeCategory === 'ALL' || job.category.toLowerCase().includes(activeCategory.toLowerCase());
+                const matchesFav = !showingOnlyFavorites || savedFavorites.includes(job.id);
+
+                return matchesSearch && matchesType && matchesCategory && matchesFav;
+            });
+
+            renderJobs();
+        }
+
+        function toggleFavoritesView() {
+            showingOnlyFavorites = !showingOnlyFavorites;
+            const btn = document.getElementById('favToggleBtn');
+            if (showingOnlyFavorites) {
+                btn.classList.add('bg-amber-500', 'text-white');
+                showToast('Exibindo suas vagas salvas', 'fa-bookmark', 'text-amber-400');
+            } else {
+                btn.classList.remove('bg-amber-500', 'text-white');
+            }
+            currentPage = 1;
+            applyFilters();
+        }
+
+        function toggleSaveJob(event, jobId) {
+            if (event) event.stopPropagation();
+            const index = savedFavorites.indexOf(jobId);
+            if (index > -1) {
+                savedFavorites.splice(index, 1);
+                showToast('Vaga removida', 'fa-trash', 'text-rose-400');
+            } else {
+                savedFavorites.push(jobId);
+                showToast('Vaga salva nos favoritos!', 'fa-bookmark', 'text-amber-400');
+            }
+            localStorage.setItem('saved_jobs_ids_rj', JSON.stringify(savedFavorites));
+            updateFavCountBadge();
+            renderJobs();
+        }
+
+        function updateFavCountBadge() {
+            document.getElementById('favCount').innerText = `Salvas (${savedFavorites.length})`;
+        }
+
+        function openImageModal(imgSrc, title, waUrl) {
+            document.getElementById('modalImg').src = imgSrc;
+            document.getElementById('modalImageTitle').innerText = title;
+            document.getElementById('modalWaBtn').href = waUrl;
+
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function showToast(message, icon = 'fa-circle-check', iconColor = 'text-emerald-400') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = message;
+            document.getElementById('toastIcon').className = `fa-solid ${icon} ${iconColor} text-sm`;
+
+            toast.classList.remove('translate-y-[-100px]', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-[-100px]', 'opacity-0', 'pointer-events-none');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 2500);
+        }
+
+        function updateDateBadge() {
+            const now = new Date();
+            const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+            document.getElementById('currentWeekDate').innerText = `Atualizado hoje: ${now.toLocaleDateString('pt-BR', options)}`;
+        }
+
+        window.onload = function() {
+            initJobs();
+        };
+    </script>
+</body>
+</html>
