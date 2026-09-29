@@ -261,7 +261,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="600" height="320" viewBox="0 0 600 320" style="background: linear-gradient(135deg, #022c22 0%, #064e3b 100%); font-family: system-ui, -apple-system, sans-serif;">
                 <rect x="15" y="15" width="570" height="290" rx="16" fill="#047857" opacity="0.15" stroke="#10b981" stroke-width="2"/>
                 <rect x="40" y="35" width="230" height="30" rx="15" fill="#22c55e"/>
-                <text x="155" y="55" fill="#ffffff" font-size="12" font-weight="800" text-anchor="middle">☀️ VAGA RJ - CONTATO DIRETO</text>
+                <text x="155" y="55" fill="#ffffff" font-size="12" font-weight="800" text-anchor="middle">☀️️ VAGA RJ - CONTATO DIRETO</text>
                 <text x="40" y="105" fill="#ffffff" font-size="21" font-weight="900">${title.length > 36 ? title.substring(0,36)+'...' : title}</text>
                 <text x="40" y="140" fill="#a7f3d0" font-size="15" font-weight="600">🏢 ${company}</text>
                 <text x="40" y="170" fill="#e2e8f0" font-size="15" font-weight="500">📍 ${city}</text>
@@ -277,68 +277,46 @@
             updateDateBadge();
             updateFavCountBadge();
 
-            // Gerador integrado de 100 vagas reais no RJ com telefones seguros de RH
-            const COMPANY_WHATSAPP_POOL = [
-                { company: "Lojas Americanas / RH", phone: "5521995571299" },
-                { company: "Grupo Casas Bahia", phone: "5521964200015" },
-                { company: "Restaurante e Bar do Porto", phone: "5521988112233" },
-                { company: "Sertec Consultoria RJ", phone: "5521971479799" },
-                { company: "Atento Brasil", phone: "5521969236061" },
-                { company: "Niterói Utilidades", phone: "5521982370752" },
-                { company: "Grupo Souza Lima RJ", phone: "5521995134036" },
-                { company: "Churrascaria Barra Grill", phone: "5521971224455" },
-                { company: "Logística Express RJ", phone: "5521981123344" },
-                { company: "Clínica Integrada Leblon", phone: "5521998877665" },
-                { company: "Guanabara Distribuidora", phone: "5521991234455" },
-                { company: "Telecom RJ Soluções", phone: "5521987654321" }
-            ];
-
-            const jobTemplates = [
-                ("Atendente de Loja e Caixa", "Comércio/Vendas", "Atendimento no caixa, reposição de produtos e organização da loja. Turno tarde/noite."),
-                ("Auxiliar de Logística e Separação", "Logística", "Carga e descarga de mercadorias, bipagem de códigos de barras e conferência no galpão."),
-                ("Ajudante de Cozinha e Lanchonete", "Gastronomia", "Preparo de insumos, corte de carnes/legumes, apoio ao chefe de cozinha e higienização."),
-                ("Auxiliar Administrativo de RH", "Administrativo", "Controle de folha de ponto, atendimento a funcionários, digitação de contratos e arquivo."),
-                ("Operador de Telemarketing Receptivo", "Atendimento", "Atendimento de chamadas para esclarecimento de dúvidas sobre serviços. Treinamento pago."),
-                ("Vendedor Interno e Balconista", "Comércio/Vendas", "Prospecção presencial de clientes, apresentação de produtos para casa e fechamento de vendas."),
-                ("Controlador de Acesso / Portaria", "Logística", "Fiscalização de portaria em condomínio residencial, recebimento de encomendas e cadastro."),
-                ("Garçom / Garçonete", "Gastronomia", "Atendimento de mesas, registro de pedidos em comanda eletrônica e servir bebidas."),
-                ("Motorista Entregador Categoria B/D", "Logística", "Coleta e entrega de encomendas na Região Metropolitana do Rio de Janeiro."),
-                ("Recepcionista Consultório Médico", "Administrativo", "Agendamento de consultas, confirmação via WhatsApp e recepção de pacientes."),
-                ("Promotor de Vendas Supermercado", "Comércio/Vendas", "Organização de gondolas, verificação de datas de validade e reposição de estoque."),
-                ("Atendente de SAC e Chat", "Atendimento", "Atendimento a clientes via chat e e-mail para resolução de chamados de suporte.")
-            ];
-
-            const RJ_LOCATIONS = [
-                "Barra da Tijuca, RJ", "Copacabana, RJ", "Centro, Rio de Janeiro - RJ",
-                "Icaraí, Niterói - RJ", "Duque de Caxias, RJ", "Nova Iguaçu, RJ",
-                "Campo Grande, RJ", "Recreio dos Bandeirantes, RJ", "São Gonçalo, RJ", "Leblon,RJ"
-            ];
-
-            allJobs = [];
-            for (let i = 1; i <= 100; i++) {
-                const tmpl = jobTemplates[(i - 1) % jobTemplates.length];
-                const jobType = (i % 5 === 0) ? "Home Office" : "Presencial";
-                const location = (jobType === "Home Office") ? "Rio de Janeiro, RJ (Home Office)" : RJ_LOCATIONS[(i * 3) % RJ_LOCATIONS.length];
-                const companyData = COMPANY_WHATSAPP_POOL[(i - 1) % COMPANY_WHATSAPP_POOL.length];
+            try {
+                // Busca o arquivo vagas.json gerado pelo robô do GitHub Actions
+                const response = await fetch('vagas.json?' + new Date().getTime());
+                if (!response.ok) throw new Error('Não foi possível carregar o arquivo vagas.json');
                 
-                const title = i > jobTemplates.length ? `${tmpl[0]} (Ref. #${i})` : tmpl[0];
-                const salary = `R$ ${(1600 + (i * 15) % 1800).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-                const encodedMsg = encodeURIComponent(`Olá! Vi a vaga de "${title}" no Zap Vagas RJ e gostaria de enviar meu currículo.`);
+                const data = await response.json();
                 
-                allJobs.push({
-                    id: i,
-                    title: title,
-                    company: companyData.company,
-                    category: tmpl[1],
-                    type: jobType,
-                    location: location,
-                    salary: salary,
-                    posted: "Hoje",
-                    phone: companyData.phone,
-                    waUrl: `https://api.whatsapp.com/send?phone=${companyData.phone}&text=${encodedMsg}`,
-                    flyerUrl: generateFlyerSvgUrl(title, companyData.company, location, salary),
-                    description: `${tmpl[2]} Oferecemos VT, VR/VA, plano de saúde e oportunidade de crescimento no RJ.`
+                allJobs = data.map((job, index) => {
+                    const title = job.title || job.cargo || "Vaga no RJ";
+                    const company = job.company || job.empresa || "Empresa Confidencial";
+                    const location = job.location || job.local || "Rio de Janeiro - RJ";
+                    const salary = job.salary || job.salario || "A combinar";
+                    const phone = (job.phone || job.whatsapp || "5521999999999").replace(/\D/g, '');
+                    const category = job.category || job.categoria || "Comércio/Vendas";
+                    const type = job.type || job.modalidade || "Presencial";
+                    const description = job.description || job.descricao || "Oportunidade para atuação no Rio de Janeiro.";
+
+                    const encodedMsg = encodeURIComponent(`Olá! Vi a vaga de "${title}" no Zap Vagas RJ e gostaria de enviar meu currículo.`);
+                    const waUrl = job.waUrl || `https://api.whatsapp.com/send?phone=${phone}&text=${encodedMsg}`;
+                    const flyerUrl = generateFlyerSvgUrl(title, company, location, salary);
+
+                    return {
+                        id: job.id || (index + 1),
+                        title: title,
+                        company: company,
+                        category: category,
+                        type: type,
+                        location: location,
+                        salary: salary,
+                        posted: "Hoje",
+                        phone: phone,
+                        waUrl: waUrl,
+                        flyerUrl: flyerUrl,
+                        description: description
+                    };
                 });
+
+            } catch (error) {
+                console.warn("Aviso: Não foi possível carregar o vagas.json, usando lista vazia.", error);
+                allJobs = [];
             }
 
             currentFilteredJobs = [...allJobs];
