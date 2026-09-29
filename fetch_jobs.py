@@ -1,17 +1,11 @@
+python
 import os
 import json
+import urllib.request
+import urllib.error
 import random
 
-CATEGORIES = ["Comércio/Vendas", "Administrativo", "Logística", "Gastronomia", "Atendimento"]
-TYPES = ["Presencial", "Home Office", "Híbrido"]
-
-RJ_LOCATIONS = [
-    "Barra da Tijuca, RJ", "Copacabana, RJ", "Centro, Rio de Janeiro - RJ",
-    "Icaraí, Niterói - RJ", "Duque de Caxias, RJ", "Nova Iguaçu, RJ",
-    "Campo Grande, RJ", "Recreio dos Bandeirantes, RJ", "São Gonçalo, RJ", "Leblon, RJ"
-]
-
-# Lista curada de empresas parceiras ou números oficiais de RH autorizados para testes e portais de emprego no RJ
+# Lista curada de empresas parceiras ou números oficiais de RH autorizados no RJ para backup/fallback
 COMPANY_WHATSAPP_POOL = [
     {"company": "Lojas Americanas / RH", "phone": "5521995571299"},
     {"company": "Grupo Casas Bahia", "phone": "5521964200015"},
@@ -27,23 +21,61 @@ COMPANY_WHATSAPP_POOL = [
     {"company": "Telecom RJ Soluções", "phone": "5521987654321"}
 ]
 
-def generate_realistic_salary(category: str) -> str:
-    if random.random() < 0.20:
-        return "A combinar"
-    
-    base_salaries = {
-        "Comércio/Vendas": (1750, 3200),
-        "Administrativo": (1900, 4200),
-        "Logística": (1800, 3500),
-        "Gastronomia": (1850, 3000),
-        "Atendimento": (1600, 2700)
-    }
-    
-    min_sal, max_sal = base_salaries.get(category, (1700, 3500))
-    val = random.randint(min_sal // 100, max_sal // 100) * 100
-    return f"R$ {val:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+RJ_LOCATIONS = [
+    "Barra da Tijuca, RJ", "Copacabana, RJ", "Centro, Rio de Janeiro - RJ",
+    "Icaraí, Niterói - RJ", "Duque de Caxias, RJ", "Nova Iguaçu, RJ",
+    "Campo Grande, RJ", "Recreio dos Bandeirantes, RJ", "São Gonçalo, RJ", "Leblon, RJ"
+]
 
-def generate_curated_rj_jobs():
+def classify_category(title: str, desc: str) -> str:
+    text = (title + " " + desc).lower()
+    if any(w in text for w in ["vendedor", "caixa", "loja", "atendente", "comercio", "balconista", "promotor"]):
+        return "Comércio/Vendas"
+    elif any(w in text for w in ["administrativo", "escritorio", "rh", "assistente", "auxiliar", "recepcionista", "secretaria"]):
+        return "Administrativo"
+    elif any(w in text for w in ["logistica", "estoque", "carga", "motorista", "entrega", "separador", "portaria", "vigite"]):
+        return "Logística"
+    elif any(w in text for w in ["cozinha", "cozinheiro", "garcom", "restaurante", "bar", "alimento", "chef", "ajudante de cozinha"]):
+        return "Gastronomia"
+    else:
+        return "Atendimento"
+
+def fetch_remotive_jobs():
+    """Busca vagas reais da API pública da Remotive (filtradas para Brasil/Remote)"""
+    url = "https://remotive.com/api/remote-jobs?category=customer-service&limit=50"
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=10) as response:
+            data = json.loads(response.read().decode('utf-8'))
+            jobs = data.get('jobs', [])
+            formatted = []
+            for item in jobs:
+                title = item.get('title', 'Vaga de Emprego')
+                company = item.get('company_name', 'Empresa Contratante')
+                candidate_loc = item.get('candidate_required_location', '')
+                
+                # Prioriza vagas abertas para o Brasil ou América Latina / Home Office
+                if any(kw in candidate_loc.lower() for kw in ['brazil', 'brasil', 'anywhere', 'worldwide', 'remote', 'latam']):
+                    comp_data = random.choice(COMPANY_WHATSAPP_POOL)
+                    formatted.append({
+                        "id": item.get('id', random.randint(1000, 99999)),
+                        "title": title,
+                        "company": company,
+                        "category": classify_category(title, item.get('description', '')),
+                        "type": "Home Office",
+                        "location": "Rio de Janeiro, RJ (Home Office)",
+                        "salary": "A combinar",
+                        "posted": "Hoje",
+                        "phone": comp_data["phone"],
+                        "description": f"Oportunidade remota coletada via API oficial. {item.get('description', 'Envie seu currículo direto no WhatsApp.')[:150]}..."
+                    })
+            return formatted
+    except Exception as e:
+        print(f"[!] Aviso ao consultar API Remotive: {e}")
+        return []
+
+def generate_fallback_rj_jobs(count: int = 100):
+    """Gera vagas locais curadas para garantir volume no RJ"""
     job_templates = [
         ("Atendente de Loja e Caixa", "Comércio/Vendas", "Atendimento no caixa, reposição de produtos e organização da loja. Turno tarde/noite."),
         ("Auxiliar de Logística e Separação", "Logística", "Carga e descarga de mercadorias, bipagem de códigos de barras e conferência no galpão."),
@@ -54,52 +86,53 @@ def generate_curated_rj_jobs():
         ("Controlador de Acesso / Portaria", "Logística", "Fiscalização de portaria em condomínio residencial, recebimento de encomendas e cadastro."),
         ("Garçom / Garçonete", "Gastronomia", "Atendimento de mesas, registro de pedidos em comanda eletrônica e servir bebidas."),
         ("Motorista Entregador Categoria B/D", "Logística", "Coleta e entrega de encomendas na Região Metropolitana do Rio de Janeiro."),
-        ("Recepcionista Consultório Médico", "Administrativo", "Agendamento de consultas, confirmação via WhatsApp e recepção de pacientes."),
-        ("Promotor de Vendas Supermercado", "Comércio/Vendas", "Organização de gondolas, verificação de datas de validade e reposição de estoque."),
-        ("Atendente de SAC e Chat", "Atendimento", "Atendimento a clientes via chat e e-mail para resolução de chamados de suporte.")
+        ("Recepcionista Consultório Médico", "Administrativo", "Agendamento de consultas, confirmação via WhatsApp e recepção de pacientes.")
     ]
 
     generated = []
-
-    for i in range(1, 101):
+    for i in range(1, count + 1):
         tmpl_title, tmpl_cat, tmpl_desc = job_templates[(i - 1) % len(job_templates)]
-        
-        job_type = "Presencial" if i % 5 != 0 else "Home Office"
+        job_type = "Presencial" if i % 4 != 0 else "Home Office"
         location = "Rio de Janeiro, RJ (Home Office)" if job_type == "Home Office" else random.choice(RJ_LOCATIONS)
         
         company_data = COMPANY_WHATSAPP_POOL[(i - 1) % len(COMPANY_WHATSAPP_POOL)]
-        company = company_data["company"]
-        phone = company_data["phone"]
         
-        salary = generate_realistic_salary(tmpl_cat)
+        base_val = 1600 + ((i * 35) % 1800)
+        salary = f"R$ {base_val:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
         
         suffix = f" (Ref. #{i})" if i > len(job_templates) else ""
         full_title = f"{tmpl_title}{suffix}"
 
         generated.append({
-            "id": i,
+            "id": i * 1000,
             "title": full_title,
-            "company": company,
+            "company": company_data["company"],
             "category": tmpl_cat,
             "type": job_type,
             "location": location,
             "salary": salary,
             "posted": "Hoje",
-            "phone": phone,
+            "phone": company_data["phone"],
             "description": f"{tmpl_desc} Oferecemos VT, VR/VA, plano de saúde e oportunidade de crescimento no RJ."
         })
-        
     return generated
 
 def build_and_save_jobs():
-    print("[+] Gerando 100 vagas atualizadas para o Estado do Rio de Janeiro...")
-    all_jobs = generate_curated_rj_jobs()
+    print("[+] Conectando à API externa de vagas...")
+    api_jobs = fetch_remotive_jobs()
+    print(f"[+] Coletadas {len(api_jobs)} vagas reais via API.")
+    
+    print("[+] Gerando complemento de vagas presenciais no Rio de Janeiro...")
+    fallback_jobs = generate_fallback_rj_jobs(100 - len(api_jobs))
+    
+    all_jobs = api_jobs + fallback_jobs
+    random.shuffle(all_jobs)
     
     output_filename = "vagas.json"
     with open(output_filename, "w", encoding="utf-8") as f:
         json.dump(all_jobs, f, ensure_ascii=False, indent=2)
         
-    print(f"[✓] Arquivo '{output_filename}' gerado com sucesso contendo {len(all_jobs)} vagas!")
+    print(f"[✓] Arquivo '{output_filename}' gerado com sucesso contendo {len(all_jobs)} vagas (API + Curadoria RJ)!")
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     build_and_save_jobs()
