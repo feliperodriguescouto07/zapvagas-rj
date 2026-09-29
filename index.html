@@ -261,7 +261,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="600" height="320" viewBox="0 0 600 320" style="background: linear-gradient(135deg, #022c22 0%, #064e3b 100%); font-family: system-ui, -apple-system, sans-serif;">
                 <rect x="15" y="15" width="570" height="290" rx="16" fill="#047857" opacity="0.15" stroke="#10b981" stroke-width="2"/>
                 <rect x="40" y="35" width="230" height="30" rx="15" fill="#22c55e"/>
-                <text x="155" y="55" fill="#ffffff" font-size="12" font-weight="800" text-anchor="middle">☀️️ VAGA RJ - CONTATO DIRETO</text>
+                <text x="155" y="55" fill="#ffffff" font-size="12" font-weight="800" text-anchor="middle">☀ VAGA RJ - CONTATO DIRETO</text>
                 <text x="40" y="105" fill="#ffffff" font-size="21" font-weight="900">${title.length > 36 ? title.substring(0,36)+'...' : title}</text>
                 <text x="40" y="140" fill="#a7f3d0" font-size="15" font-weight="600">🏢 ${company}</text>
                 <text x="40" y="170" fill="#e2e8f0" font-size="15" font-weight="500">📍 ${city}</text>
@@ -278,7 +278,6 @@
             updateFavCountBadge();
 
             try {
-                // Busca o arquivo vagas.json gerado pelo robô do GitHub Actions
                 const response = await fetch('vagas.json?' + new Date().getTime());
                 if (!response.ok) throw new Error('Não foi possível carregar o arquivo vagas.json');
                 
