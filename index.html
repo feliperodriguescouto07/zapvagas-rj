@@ -43,6 +43,16 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+        /* Efeito de destaque para a vaga compartilhada */
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .highlight-job {
+            animation: pulse-border 2s infinite;
+            border-color: #22c55e !important;
+        }
     </style>
 </head>
 <body class="min-h-full flex flex-col text-slate-800 antialiased pb-20 sm:pb-0">
@@ -320,6 +330,9 @@
 
             currentFilteredJobs = [...allJobs];
             renderJobs();
+            
+            // VERIFICA SE O USUÁRIO CLICOU EM UM LINK DE VAGA COMPARTILHADA (#vaga-ID)
+            setTimeout(checkUrlHashTarget, 200);
         }
 
         function openPublishModal() {
@@ -377,10 +390,42 @@
             showToast('Vaga no RJ publicada com sucesso!', 'fa-circle-check', 'text-emerald-400');
         }
 
-        // Função exclusiva para partilhar a vaga diretamente no WhatsApp
-        function compartilharVagaZap(cargo, empresa, telefone) {
-            const texto = `🔥 Vaga imperdível no Zap Vagas RJ!\n\nCargo: *${cargo}*\nEmpresa: ${empresa}\n\nCandidate-se ou veja o contato aqui: https://wa.me/${telefone}\n\nEnviado pelo Zap Vagas RJ.`;
+        // COMPARTILHAMENTO INTELIGENTE APONTANDO PARA A ÂNCORA DA VAGA ESPECÍFICA
+        function compartilharVagaZap(jobId, cargo, empresa) {
+            const baseUrl = window.location.href.split('#')[0];
+            const vagaUrl = `${baseUrl}#vaga-${jobId}`;
+            const texto = `🔥 Vaga imperdível no Zap Vagas RJ!\n\nCargo: *${cargo}*\nEmpresa: ${empresa}\n\n👉 Veja os detalhes e envie seu currículo direto no link:\n${vagaUrl}\n\nCompartilhado via Zap Vagas RJ.`;
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`, '_blank');
+        }
+
+        function checkUrlHashTarget() {
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#vaga-')) {
+                const targetId = hash.replace('#vaga-', '');
+                
+                // Encontrar a vaga correspondente nos dados
+                const jobIndex = allJobs.findIndex(j => String(j.id) === String(targetId));
+                if (jobIndex > -1) {
+                    // Calcular em qual página essa vaga está
+                    const targetPage = Math.floor(jobIndex / jobsPerPage) + 1;
+                    if (targetPage !== currentPage) {
+                        currentPage = targetPage;
+                        renderJobs();
+                    }
+
+                    // Aguardar renderização para rolar a tela e destacar
+                    setTimeout(() => {
+                        const targetElement = document.getElementById(`card-vaga-${targetId}`);
+                        if (targetElement) {
+                            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            targetElement.classList.add('highlight-job');
+                            setTimeout(() => {
+                                targetElement.classList.remove('highlight-job');
+                            }, 4000);
+                        }
+                    }, 100);
+                }
+            }
         }
 
         function renderJobs() {
@@ -416,6 +461,7 @@
                 const isSaved = savedFavorites.includes(job.id);
                 
                 const card = document.createElement('div');
+                card.id = `card-vaga-${job.id}`; // ID exclusivo para a âncora funcionar perfeitamente
                 card.className = "bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm space-y-3 hover:shadow-md transition";
 
                 card.innerHTML = `
@@ -455,8 +501,8 @@
                             <span>Enviar Currículo no WhatsApp</span>
                         </a>
 
-                        <!-- NOVO BOTÃO DE COMPARTILHAR APENAS NO WHATSAPP -->
-                        <button onclick="compartilharVagaZap('${job.title.replace(/'/g, "\\'")}', '${job.company.replace(/'/g, "\\'")}', '${job.phone}')"
+                        <!-- COMPARTILHAMENTO DIRETO PARA A VAGA ESPECÍFICA NO SITE -->
+                        <button onclick="compartilharVagaZap(${job.id}, '${job.title.replace(/'/g, "\\'")}', '${job.company.replace(/'/g, "\\'")}')"
                                 class="w-full bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 cursor-pointer border border-slate-200">
                             <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i>
                             <span>Enviar Vaga para Alguém no WhatsApp</span>
@@ -583,7 +629,7 @@
         }
 
         function openImageModal(imgSrc, title, waUrl) {
-            document.getElementById('modalImg').src = imgSrc;
+            document.getElementById('modalImg').src, imgSrc;
             document.getElementById('modalImageTitle').innerText = title;
             document.getElementById('modalWaBtn').href = waUrl;
 
